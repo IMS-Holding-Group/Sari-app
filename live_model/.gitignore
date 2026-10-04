@@ -1,0 +1,4 @@
+.env
+__pycache__/
+reports/
+iot/sari_esp32/secrets.h

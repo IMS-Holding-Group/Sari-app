@@ -1,0 +1,8 @@
+torch
+numpy
+pandas
+flask
+waitress
+reportlab
+arabic-reshaper
+python-bidi

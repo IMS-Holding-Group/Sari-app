@@ -1,0 +1,20 @@
+{
+  "window": 120,
+  "tau": [
+    0.95,
+    0.95,
+    0.95,
+    0.85
+  ],
+  "tau_pre": 1.01,
+  "confirm": 3,
+  "limits": {
+    "overload_pu": 1.13,
+    "short_pu": 5.0,
+    "v_low_pu": 0.9,
+    "v_high_pu": 1.1,
+    "leak_ma": 30.0,
+    "temp_c": 70.0,
+    "persist_s": 3
+  }
+}

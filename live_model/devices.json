@@ -1,0 +1,7 @@
+{
+  "default": {"rated_current": 40, "nominal_voltage": 220, "location": ""},
+  "SARI-SENS-01": {"rated_current": 40, "nominal_voltage": 220, "location": "Ground Floor Utility Room"},
+  "SARI-SENS-02": {"rated_current": 32, "nominal_voltage": 220, "location": "Rooftop Plant Room"},
+  "SARI-SENS-03": {"rated_current": 32, "nominal_voltage": 220, "location": "Floor 2 IT Bay"},
+  "SARI-SENS-04": {"rated_current": 63, "nominal_voltage": 380, "location": "Zone B Manufacturing"}
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SARI - لوحة النموذج والنتائج</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230B1F3A'/%3E%3Cpath d='M13 3 6 14h5l-1 7 7-11h-5z' fill='%230066FF'/%3E%3C/svg%3E">
+<style>
+/* ===== الأساس ===== */
+* { box-sizing: border-box }
+body {
+ margin: 0;
+ padding: 24px;
+ font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+ color: #E2E8F0;
+ background: #0B1F3A }
+h1, h2, h3 { margin: 0 0 12px }
+h1 { font-size: 1.5rem }
+h2 { font-size: 1.1rem }
+.muted { color: #94A3B8 }
+.ltr { direction: ltr; unicode-bidi: isolate }
+
+/* ===== التخطيط ===== */
+.wrap { max-width: 1100px; margin: 0 auto }
+header {
+ display: flex;
+ margin-bottom: 20px;
+ align-items: center;
+ gap: 12px }
+.grid {
+ display: grid;
+ margin-bottom: 16px;
+ grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+ gap: 16px }
+.card {
+ padding: 18px;
+ border: 1px solid #1E3A66;
+ border-radius: 14px;
+ background: #102847 }
+.wide { margin-bottom: 16px }
+
+/* ===== المؤشرات ===== */
+.kpi { font-size: 2rem; font-weight: 700 }
+.good { color: #22C55E }
+.warn { color: #FF9800 }
+.blue { color: #3385FF }
+
+/* ===== الجداول ===== */
+table { width: 100%; border-collapse: collapse }
+th, td {
+ padding: 8px 6px;
+ border-bottom: 1px solid #1E3A66;
+ text-align: right }
+th { font-weight: 600; color: #94A3B8 }
+
+/* ===== الأشرطة ===== */
+.bar {
+ height: 10px;
+ border-radius: 6px;
+ background: #07152B;
+ overflow: hidden }
+.fill { height: 100%; background: #22C55E }
+
+/* ===== مسار القرار ===== */
+.flow {
+ display: flex;
+ flex-wrap: wrap;
+ align-items: center;
+ gap: 8px }
+.step {
+ padding: 8px 12px;
+ border: 1px solid #1E3A66;
+ border-radius: 10px;
+ background: #07152B }
+.arrow { color: #0066FF }
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header>
+  <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#102847"/><path d="M13 3 6 14h5l-1 7 7-11h-5z" fill="#0066FF"/></svg>
+  <div>
+   <h1>SARI - نموذج كشف الأعطال الكهربائية</h1>
+   <div class="muted">آخر تقييم: <span class="ltr">2026/9/27</span><span>م</span> <span class="ltr">11:52</span><span>ص</span> - المصدر <span class="ltr">metrics.json</span> و <span class="ltr">sari_config.json</span></div>
+  </div>
+ </header>
+
+ <div class="grid" id="kpis"></div>
+
+ <div class="card wide">
+  <h2>كيف يقرر النموذج القطع</h2>
+  <div class="flow">
+   <span class="step">قراءة كل ثانية: تيار، جهد، تسرب، حرارة</span><span class="arrow">&larr;</span>
+   <span class="step">نافذة آخر <b id="win"></b> قراءة</span><span class="arrow">&larr;</span>
+   <span class="step">شبكة LSTM طبقتان × 64</span><span class="arrow">&larr;</span>
+   <span class="step">احتمال كل عطل ≥ العتبة لـ <b id="conf"></b> قراءات متتالية</span><span class="arrow">&larr;</span>
+   <span class="step">القراءة فعلًا تجاوزت الحد الفيزيائي</span><span class="arrow">&larr;</span>
+   <span class="step good">قطع التيار + تقرير PDF</span>
+  </div>
+ </div>
+
+ <div class="card wide">
+  <h2>الكشف لكل نوع عطل (20,000 تسلسل اختبار)</h2>
+  <table>
+   <thead><tr><th>العطل</th><th>الحالات</th><th>نسبة الكشف</th><th></th><th>متوسط زمن الكشف</th><th>أقصى زمن</th><th>تصنيف خاطئ</th><th>العتبة</th></tr></thead>
+   <tbody id="faults"></tbody>
+  </table>
+ </div>
+
+ <div class="grid">
+  <div class="card">
+   <h2>محاكاة التطبيق</h2>
+   <table><thead><tr><th>السيناريو</th><th>إنذار قبل العطل</th><th>القطع بعد</th></tr></thead><tbody id="sim"></tbody></table>
+  </div>
+  <div class="card">
+   <h2>حدود القطع الفيزيائية</h2>
+   <table><tbody id="limits"></tbody></table>
+  </div>
+ </div>
+
+ <div class="card">
+  <h2>ملاحظات</h2>
+  <ul class="muted">
+   <li>التحذير المبكر (prefault) معطّل حاليًا لأن عتبته <span class="ltr" id="tpre"></span> أعلى من أي احتمال.</li>
+   <li>البيانات الحقيقية المحجوزة: ملف UCI لاستهلاك منزلي، لم يُستخدم في التدريب.</li>
+   <li>أرقام هذه اللوحة من ملف التقييم وليست قياسًا حيًا من لوحة كهرباء.</li>
+  </ul>
+ </div>
+</div>
+
+<script>
+const metrics = {
+ test: {
+  overcurrent: { episodes: 1948, detected: 0.9728, median: 2, max: 60, wrong: 0 },
+  voltage: { episodes: 1947, detected: 0.9702, median: 2, max: 17, wrong: 5 },
+  leakage: { episodes: 2094, detected: 0.9733, median: 2, max: 15, wrong: 1 },
+  overheat: { episodes: 1058, detected: 0.966, median: 2, max: 4, wrong: 0 }
+ },
+ falseCutoffs: 5,
+ sequences: 20000,
+ normalSequences: 13536,
+ realDays: 28.7,
+ realFalse: 0,
+ normal24h: 0,
+ sim: [
+  { name: 'ارتفاع تيار', before: 0, latency: 'تيار 4ث' },
+  { name: 'انخفاض جهد', before: 0, latency: 'جهد 4ث' },
+  { name: 'تسرب أرضي', before: 0, latency: 'تسرب 3ث' },
+  { name: 'تيار + تسرب', before: 0, latency: 'تيار 4ث، تسرب 3ث' }
+ ],
+ tau: [0.95, 0.95, 0.95, 0.85],
+ tauPre: 1.01,
+ window: 120,
+ confirm: 3,
+ limits: [
+  ['حمل زائد', '≥ 113% من التيار المقنن'],
+  ['قصر فوري', '≥ 500% من التيار المقنن'],
+  ['الجهد', 'خارج 90% - 110% من الاسمي'],
+  ['التسرب الأرضي', '≥ 30 مللي أمبير'],
+  ['الحرارة', '≥ 70 درجة مئوية'],
+  ['الاستمرار للتسمية', '3 ثوانٍ']
+ ]
+};
+
+const names = { overcurrent: 'ارتفاع التيار', voltage: 'اضطراب الجهد', leakage: 'تسرب أرضي', overheat: 'ارتفاع الحرارة' };
+const pct = (v) => (v * 100).toFixed(1) + '%';
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+const avg = Object.values(metrics.test).reduce((s, f) => s + f.detected, 0) / 4;
+const kpis = [
+ ['متوسط نسبة الكشف', pct(avg), 'good'],
+ ['قطع كاذب', metrics.falseCutoffs + ' من ' + metrics.sequences.toLocaleString('en-US'), 'warn'],
+ ['إنذارات كاذبة على بيانات حقيقية', metrics.realFalse + ' خلال ' + metrics.realDays + ' يوم', 'good'],
+ ['إنذارات كاذبة بالتطبيق 24 ساعة', String(metrics.normal24h), 'good']
+];
+document.getElementById('kpis').innerHTML = kpis.map(([t, v, c]) => `<div class="card"><div class="muted">${esc(t)}</div><div class="kpi ${c}">${esc(v)}</div></div>`).join('');
+
+document.getElementById('faults').innerHTML = Object.entries(metrics.test).map(([k, f], i) => `<tr>
+ <td>${esc(names[k])}</td><td>${f.episodes.toLocaleString('en-US')}</td><td class="good">${pct(f.detected)}</td>
+ <td style="width: 22%"><div class="bar"><div class="fill" style="width: ${f.detected * 100}%"></div></div></td>
+ <td>${f.median} ث</td><td>${f.max} ث</td><td class="${f.wrong ? 'warn' : 'good'}">${f.wrong}</td><td class="blue">${metrics.tau[i]}</td></tr>`).join('');
+
+document.getElementById('sim').innerHTML = metrics.sim.map((s) => `<tr><td>${esc(s.name)}</td><td class="good">${s.before}</td><td>${esc(s.latency)}</td></tr>`).join('');
+document.getElementById('limits').innerHTML = metrics.limits.map(([a, b]) => `<tr><td>${esc(a)}</td><td class="blue">${esc(b)}</td></tr>`).join('');
+document.getElementById('win').textContent = metrics.window;
+document.getElementById('conf').textContent = metrics.confirm;
+document.getElementById('tpre').textContent = metrics.tauPre;
+</script>
+</body>
+</html>

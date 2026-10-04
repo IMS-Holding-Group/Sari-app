@@ -1,0 +1,76 @@
+{
+  "test_sequences": {
+    "overcurrent": {
+      "episodes": 1948,
+      "detected": 0.9728,
+      "median_latency_s": 2.0,
+      "max_latency_s": 60,
+      "wrong_class_alarms": 0
+    },
+    "voltage": {
+      "episodes": 1947,
+      "detected": 0.9702,
+      "median_latency_s": 2.0,
+      "max_latency_s": 17,
+      "wrong_class_alarms": 5
+    },
+    "leakage": {
+      "episodes": 2094,
+      "detected": 0.9733,
+      "median_latency_s": 2.0,
+      "max_latency_s": 15,
+      "wrong_class_alarms": 1
+    },
+    "overheat": {
+      "episodes": 1058,
+      "detected": 0.966,
+      "median_latency_s": 2.0,
+      "max_latency_s": 4,
+      "wrong_class_alarms": 0
+    },
+    "false_cutoffs": 5,
+    "sequences": 20000,
+    "normal_sequences": 13536
+  },
+  "real_uci_held_out": {
+    "days": 28.7,
+    "false_alarm_seconds": 0
+  },
+  "app_simulation": {
+    "normal_24h_false_alarms": 0,
+    "surge": {
+      "before_fault_alarms": 0,
+      "latency_s": {
+        "overcurrent": 4
+      }
+    },
+    "dip": {
+      "before_fault_alarms": 0,
+      "latency_s": {
+        "voltage": 4
+      }
+    },
+    "leak": {
+      "before_fault_alarms": 0,
+      "latency_s": {
+        "leakage": 3
+      }
+    },
+    "surge+leak": {
+      "before_fault_alarms": 0,
+      "latency_s": {
+        "overcurrent": 4,
+        "leakage": 3
+      }
+    }
+  },
+  "client_dataset_all_normal_accuracy": 0.9787,
+  "tau": [
+    0.95,
+    0.95,
+    0.95,
+    0.85
+  ],
+  "tau_pre": 1.01,
+  "minutes": 10.0
+}
